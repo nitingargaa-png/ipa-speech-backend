@@ -13,6 +13,9 @@ const PORT = process.env.PORT || 3001
 const subscriptionKey = process.env.AZURE_SPEECH_KEY
 const region = process.env.AZURE_SPEECH_REGION
 
+// Render runs behind a proxy, so express-rate-limit needs trust proxy enabled to correctly identify clients via X-Forwarded-For.
+app.set('trust proxy', 1)
+
 app.use(helmet())
 
 const limiter = rateLimit({
@@ -31,7 +34,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true)
+    if (!origin || origin === 'null') return callback(null, true)
     if (allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
